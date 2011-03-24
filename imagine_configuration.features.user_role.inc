@@ -22,5 +22,11 @@ function imagine_configuration_user_default_roles() {
     'weight' => '3',
   );
 
+  // Exported role: image technician
+  $roles['image technician'] = array(
+    'name' => 'image technician',
+    'weight' => '5',
+  );
+
   return $roles;
 }
