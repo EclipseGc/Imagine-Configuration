@@ -6,35 +6,27 @@
  */
 
 $plugin = array(
-  'title' => t('Create Node'),
-  'description' => t('Allows the creation of a particular node type.  This circumvents the typical drupal access controls on node creation.'),
-  'required context' => new ctools_context_optional(t('Node'), 'node'),
-  'content form' => 'context_admin_node_create_menu_content_form',
-  'content form submit' => 'context_admin_node_create_menu_content_form_submit',
-  'render' => 'context_admin_node_create_menu_render_page',
-  'node insert' => 'context_admin_node_create_menu_node_insert',
+  'title' => t('Create Node: Publish Options'),
+  'description' => t('Allows the creation of a particular node type and exposes its default publishing options.  This circumvents the typical drupal access controls on node creation.'),
+  'content form' => 'imagine_configuration_node_create_pubopt_content_form',
+  'content form submit' => 'imagine_configuration_node_create_pubopt_content_form_submit',
+  'render' => 'imagine_configuration_node_create_pubopt_render_page',
+  'node insert' => 'imagine_configuration_node_create_pubopt_node_insert',
 );
 
 
-function context_admin_node_create_menu_content_form($form, $form_state, $cache = NULL) {
-  ctools_include('dependent');
-  $context_options = $form['context']['#options'];
-  unset($context_options['empty']);
-  $context_dependencies = array();
-  foreach ($context_options as $c_key => $c_option) {
-    $context_dependencies[] = $c_key;
+function imagine_configuration_node_create_pubopt_content_form($form, $form_state, $cache = NULL) {
+  if (isset($form_state['page']->handlers[$form_state['handler_id']]->conf['node_types'])) {
+    $default = $form_state['page']->handlers[$form_state['handler_id']]->conf['node_types'];
   }
-  if (isset($form_state['page']->handlers[$form_state['handler_id']]->conf['context_admin_options_items'])) {
-    $default = $form_state['page']->handlers[$form_state['handler_id']]->conf['context_admin_options_items'];
-  }
-  elseif (isset($cache->handlers[$form_state['handler_id']]->conf['context_admin_options_items'])) {
-    $default = $cache->handlers[$form_state['handler_id']]->conf['context_admin_options_items'];
+  elseif (isset($cache->handlers[$form_state['handler_id']]->conf['node_types'])) {
+    $default = $cache->handlers[$form_state['handler_id']]->conf['node_types'];
   }
   else {
     $default = '';
   }
   $options = node_type_get_names();
-  $form['context_admin_options_items'] = array(
+  $form['node_types'] = array(
     '#type' => 'radios',
     '#title' => t('Select the node type you would like to create'),
     '#required' => TRUE,
@@ -42,74 +34,53 @@ function context_admin_node_create_menu_content_form($form, $form_state, $cache 
     '#default_value' => $default,
   );
 
-  if (isset($form_state['page']->handlers[$form_state['handler_id']]->conf['context_admin_sub_page'])) {
-    $sub = $form_state['page']->handlers[$form_state['handler_id']]->conf['context_admin_sub_page'];
+  if (isset($form_state['page']->handlers[$form_state['handler_id']]->conf['publishing_options'])) {
+    $sub = $form_state['page']->handlers[$form_state['handler_id']]->conf['publishing_options'];
   }
-  elseif (isset($cache->handlers[$form_state['handler_id']]->conf['context_admin_sub_page'])) {
-    $sub = $cache->handlers[$form_state['handler_id']]->conf['context_admin_sub_page'];
+  elseif (isset($cache->handlers[$form_state['handler_id']]->conf['publishing_options'])) {
+    $sub = $cache->handlers[$form_state['handler_id']]->conf['publishing_options'];
   }
   else {
     $sub = 0;
   }
-  $form['context_admin_sub_page'] = array(
+  $form['publishing_options'] = array(
     '#type' => 'checkbox',
     '#title' => t('Create as sub node'),
     '#description' => t('Creates a node as a sub node of the currently viewed node within the menu system.'),
     '#default_value' => $sub,
-    '#process' => array('ctools_dependent_process'),
-    '#dependency' => array('edit-context' => array(implode(', ', $context_dependencies))),
   );
 
   return $form;
 }
 
-function context_admin_node_create_menu_content_form_submit($form, &$form_state) {
+function imagine_configuration_node_create_pubopt_content_form_submit($form, &$form_state) {
   $cache = context_admin_get_page_cache($form_state['page']->subtask_id);
   if (!is_null($form_state['handler_id'])) {
-    $form_state['page']->handlers[$form_state['handler_id']]->conf['context_admin_options_items'] = $form_state['values']['context_admin_options_items'];
+    $form_state['page']->handlers[$form_state['handler_id']]->conf['node_types'] = $form_state['values']['node_types'];
   }
   else {
-    $form_state['page']->new_handler->conf['context_admin_options_items'] = $form_state['values']['context_admin_options_items'];
+    $form_state['page']->new_handler->conf['node_types'] = $form_state['values']['node_types'];
   }
-  if ($form_state['values']['context_admin_sub_page']) {
+  if ($form_state['values']['publishing_options']) {
     if (!is_null($form_state['handler_id'])) {
-      $form_state['page']->handlers[$form_state['handler_id']]->conf['context_admin_sub_page'] = $form_state['values']['context_admin_sub_page'];
+      $form_state['page']->handlers[$form_state['handler_id']]->conf['publishing_options'] = $form_state['values']['publishing_options'];
     }
     else {
-      $form_state['page']->new_handler->conf['context_admin_sub_page'] = $form_state['values']['context_admin_sub_page'];
+      $form_state['page']->new_handler->conf['publishing_options'] = $form_state['values']['publishing_options'];
     }
   }
   context_admin_set_page_cache($form_state['page']->subtask_id, $form_state['page']);
   return $form_state;
 }
 
-function context_admin_node_create_menu_render_page($handler, $base_contexts, $args, $test = TRUE) {
-  $type = $handler->conf['context_admin_options_items'];
+function imagine_configuration_node_create_pubopt_render_page($handler, $base_contexts, $args, $test = TRUE) {
+  $type = $handler->conf['node_types'];
   module_load_include('inc', 'node', 'node.pages');
 
   return node_add($type);
 }
 
-function context_admin_node_create_menu_node_insert($node, $page) {
-  if (isset($page['handler']->conf['context_admin_sub_page']) && $page['handler']->conf['context_admin_sub_page']) {
-    $context = $page['contexts'][$page['handler']->conf['submitted_context']];
-    $parent_id = $context->argument;
-    $query = db_select('menu_links', 'ml')
-      ->fields('ml', array('menu_name', 'mlid'))
-      ->condition('link_path', 'node/' . $parent_id, '=')
-      ->condition('module', 'menu', '=')
-      ->range(0, 1);
-    $results = $query->execute();
-    foreach ($results as $result) {
-      if ($result) {
-        $item = array(
-          'link_title' => $node->title,
-          'menu_name' => $result->menu_name,
-          'plid' => $result->mlid,
-          'link_path' => 'node/'. $node->nid,
-        );
-        menu_link_save($item);
-      }
-    }
-  }
+function imagine_configuration_node_create_pubopt_node_insert($node, $page) {
+  $status = isset($page['handler']->conf['publishing_options']) ? TRUE : FALSE;
+  $node->status = $status;
 }
