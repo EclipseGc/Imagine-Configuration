@@ -44,7 +44,7 @@ function imagine_configuration_node_create_pubopt_content_form($form, $form_stat
     $sub = 0;
   }
   $form['publishing_options'] = array(
-    '#type' => 'Radios',
+    '#type' => 'radios',
     '#title' => t('Publishing Options'),
     '#description' => t('Choose whethere this node type is published or unpublished by default.'),
     '#options' => array(
