@@ -86,5 +86,10 @@ function imagine_configuration_node_create_pubopt_render_page($handler, $base_co
 
 function imagine_configuration_node_create_pubopt_form_alter(&$form, $form_state, $form_id) {
   $page = page_manager_get_current_page();
-  drupal_set_message('<pre>' . var_export($page, TRUE) . '</pre>');
+  if ($page) {
+    $type = isset($page['handler']->conf['node_types']) ? $page['handler']->conf['node_types'] : '';
+    if ($form_id == $type . '_node_form') {
+      drupal_set_message('<pre>' . var_export($form, TRUE) . '</pre>');
+    }
+  }
 }
