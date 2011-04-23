@@ -89,7 +89,7 @@ function imagine_configuration_node_create_pubopt_form_alter(&$form, $form_state
   if ($page) {
     $type = isset($page['handler']->conf['node_types']) ? $page['handler']->conf['node_types'] : '';
     if ($form_id == $type . '_node_form') {
-      drupal_set_message('<pre>' . var_export($form, TRUE) . '</pre>');
+      $form['options']['status'] = $page['handler']->conf['publishing_options'];
     }
   }
 }
