@@ -86,12 +86,10 @@ function imagine_configuration_node_create_pubopt_render_page($handler, $base_co
 
 function imagine_configuration_node_create_pubopt_form_alter(&$form, $form_state, $form_id) {
   $page = page_manager_get_current_page();
-  drupal_set_message('<pre>' . var_export($page, TRUE) . '</pre>');
-  if ($page) {
+  if ($page && (isset($page['handler']->conf['context_admin_options']) && $page['handler']->conf['context_admin_options'] == 'node_create_pubopt')) {
     $type = isset($page['handler']->conf['node_types']) ? $page['handler']->conf['node_types'] : '';
     if ($form_id == $type . '_node_form') {
-      drupal_set_message('<pre>' . var_export('test', TRUE) . '</pre>');
-      //$form['options']['status'] = $page['handler']->conf['publishing_options'];
+      $form['options']['status']['#default_value'] = $page['handler']->conf['publishing_options'];
     }
   }
 }
