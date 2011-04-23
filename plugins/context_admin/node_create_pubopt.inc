@@ -44,10 +44,14 @@ function imagine_configuration_node_create_pubopt_content_form($form, $form_stat
     $sub = 0;
   }
   $form['publishing_options'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Create as sub node'),
-    '#description' => t('Creates a node as a sub node of the currently viewed node within the menu system.'),
-    '#default_value' => $sub,
+    '#type' => 'Radios',
+    '#title' => t('Publishing Options'),
+    '#description' => t('Choose whethere this node type is published or unpublished by default.'),
+    '#options' => array(
+      t('Unpublished'),
+      t('Published'),
+    ),
+    '#default_value' => $sub ? $sub : 1,
   );
 
   return $form;
@@ -81,6 +85,5 @@ function imagine_configuration_node_create_pubopt_render_page($handler, $base_co
 }
 
 function imagine_configuration_node_create_pubopt_node_insert($node, $page) {
-  $status = isset($page['handler']->conf['publishing_options']) ? TRUE : FALSE;
-  $node->status = $status;
+  $node->status = $page['handler']->conf['publishing_options'];
 }
