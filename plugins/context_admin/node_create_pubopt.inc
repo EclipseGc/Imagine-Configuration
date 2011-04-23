@@ -60,19 +60,13 @@ function imagine_configuration_node_create_pubopt_content_form($form, $form_stat
 
 function imagine_configuration_node_create_pubopt_content_form_submit($form, &$form_state) {
   $cache = context_admin_get_page_cache($form_state['page']->subtask_id);
-  if (!is_null($form_state['handler_id'])) {
+  if (isset($form_state['handler_id'])) {
     $form_state['page']->handlers[$form_state['handler_id']]->conf['node_types'] = $form_state['values']['node_types'];
+    $form_state['page']->handlers[$form_state['handler_id']]->conf['publishing_options'] = $form_state['values']['publishing_options'];
   }
   else {
     $form_state['page']->new_handler->conf['node_types'] = $form_state['values']['node_types'];
-  }
-  if ($form_state['values']['publishing_options']) {
-    if (!is_null($form_state['handler_id'])) {
-      $form_state['page']->handlers[$form_state['handler_id']]->conf['publishing_options'] = $form_state['values']['publishing_options'];
-    }
-    else {
-      $form_state['page']->new_handler->conf['publishing_options'] = $form_state['values']['publishing_options'];
-    }
+    $form_state['page']->new_handler->conf['publishing_options'] = $form_state['values']['publishing_options'];
   }
   context_admin_set_page_cache($form_state['page']->subtask_id, $form_state['page']);
   return $form_state;
@@ -97,7 +91,6 @@ function imagine_configuration_node_create_pubopt_form_alter(&$form, $form_state
         $pub = FALSE;
       }
       $form['options']['status']['#default_value'] = $pub;
-      drupal_set_message('<pre>' . var_export($form['options']['status'], TRUE) . '</pre>');
     }
   }
 }
