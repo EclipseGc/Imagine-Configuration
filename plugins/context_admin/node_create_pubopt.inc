@@ -35,23 +35,23 @@ function imagine_configuration_node_create_pubopt_content_form($form, $form_stat
   );
 
   if (isset($form_state['page']->handlers[$form_state['handler_id']]->conf['publishing_options'])) {
-    $sub = $form_state['page']->handlers[$form_state['handler_id']]->conf['publishing_options'];
+    $pub = $form_state['page']->handlers[$form_state['handler_id']]->conf['publishing_options'];
   }
   elseif (isset($cache->handlers[$form_state['handler_id']]->conf['publishing_options'])) {
-    $sub = $cache->handlers[$form_state['handler_id']]->conf['publishing_options'];
+    $pub = $cache->handlers[$form_state['handler_id']]->conf['publishing_options'];
   }
   else {
-    $sub = 0;
+    $pub = 'published';
   }
   $form['publishing_options'] = array(
     '#type' => 'radios',
     '#title' => t('Publishing Options'),
     '#description' => t('Choose whethere this node type is published or unpublished by default.'),
     '#options' => array(
-      t('Unpublished'),
-      t('Published'),
+      'unpublished' => t('Unpublished'),
+      'published' => t('Published'),
     ),
-    '#default_value' => $sub,
+    '#default_value' => $pub,
     '#required' => TRUE,
   );
 
@@ -90,7 +90,13 @@ function imagine_configuration_node_create_pubopt_form_alter(&$form, $form_state
   if ($page && (isset($page['handler']->conf['context_admin_options']) && $page['handler']->conf['context_admin_options'] == 'node_create_pubopt')) {
     $type = isset($page['handler']->conf['node_types']) ? $page['handler']->conf['node_types'] : '';
     if ($form_id == $type . '_node_form') {
-      $form['options']['status']['#default_value'] = $page['handler']->conf['publishing_options'];
+      if ($page['handler']->conf['publishing_options'] == 'published') {
+        $pub = TRUE;
+      }
+      else {
+        $pub = FALSE;
+      }
+      $form['options']['status']['#default_value'] = $pub;
       drupal_set_message('<pre>' . var_export($form['options']['status'], TRUE) . '</pre>');
     }
   }
