@@ -51,7 +51,8 @@ function imagine_configuration_node_create_pubopt_content_form($form, $form_stat
       t('Unpublished'),
       t('Published'),
     ),
-    '#default_value' => $sub ? $sub : 1,
+    '#default_value' => $sub,
+    '#required' => TRUE,
   );
 
   return $form;
@@ -90,6 +91,7 @@ function imagine_configuration_node_create_pubopt_form_alter(&$form, $form_state
     $type = isset($page['handler']->conf['node_types']) ? $page['handler']->conf['node_types'] : '';
     if ($form_id == $type . '_node_form') {
       $form['options']['status']['#default_value'] = $page['handler']->conf['publishing_options'];
+      drupal_set_message('<pre>' . var_export($form['options']['status'], TRUE) . '</pre>');
     }
   }
 }
