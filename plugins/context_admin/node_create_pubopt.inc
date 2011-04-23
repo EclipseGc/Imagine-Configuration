@@ -11,7 +11,7 @@ $plugin = array(
   'content form' => 'imagine_configuration_node_create_pubopt_content_form',
   'content form submit' => 'imagine_configuration_node_create_pubopt_content_form_submit',
   'render' => 'imagine_configuration_node_create_pubopt_render_page',
-  'node insert' => 'imagine_configuration_node_create_pubopt_node_insert',
+  'form alter' => 'imagine_configuration_node_create_pubopt_form_alter',
 );
 
 
@@ -84,6 +84,7 @@ function imagine_configuration_node_create_pubopt_render_page($handler, $base_co
   return node_add($type);
 }
 
-function imagine_configuration_node_create_pubopt_node_insert($node, $page) {
-  $node->status = $page['handler']->conf['publishing_options'];
+function imagine_configuration_node_create_pubopt_form_alter(&$form, $form_state, $form_id) {
+  $page = page_manager_get_current_page();
+  drupal_set_message('<pre>' . var_export($page, TRUE) . '</pre>');
 }
